@@ -1,13 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, Sparkles } from "lucide-react";
+import { Heart, Sparkles, MailOpen } from "lucide-react";
 import FloatingHearts from "../components/FloatingHearts";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const [hasOpened, setHasOpened] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [noClicks, setNoClicks] = useState(0);
+
+  const handleOpenSite = () => {
+    setHasOpened(true);
+    // Dispatch custom event or click trigger for immediate audio unlock
+    window.dispatchEvent(new Event("click"));
+  };
 
   const handleYes = () => {
     setIsTransitioning(true);
@@ -45,6 +52,47 @@ export default function Landing() {
     <div className="relative min-h-screen w-full flex items-center justify-center bg-gradient-to-tr from-pink-100 via-rose-50 to-white overflow-hidden px-4">
       {/* Persistent floating hearts in background */}
       <FloatingHearts count={12} />
+
+      {/* Opening Envelope Gate Overlay for Instant Auto-Play Audio Unlock */}
+      <AnimatePresence>
+        {!hasOpened && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 1.1 }}
+            transition={{ duration: 0.5 }}
+            onClick={handleOpenSite}
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-pink-50/90 backdrop-blur-md cursor-pointer px-4 text-center"
+          >
+            <motion.div
+              animate={{ y: [0, -10, 0] }}
+              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+              className="bg-white p-8 md:p-12 rounded-3xl shadow-2xl border border-pink-200/60 max-w-sm w-full flex flex-col items-center gap-5"
+            >
+              <div className="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center text-pink-500 shadow-inner">
+                <MailOpen className="w-10 h-10 animate-pulse" />
+              </div>
+              <div>
+                <h2 className="font-poppins text-xl md:text-2xl font-bold text-gray-800 mb-2">
+                  Ada pesan spesial buat kamu 💌
+                </h2>
+                <p className="font-poppins text-sm text-pink-500 font-medium">
+                  Sentuh di mana saja untuk membuka ✨
+                </p>
+              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="mt-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-poppins font-semibold px-8 py-3 rounded-full shadow-lg shadow-pink-500/30 text-sm flex items-center gap-2"
+              >
+                <Heart className="w-4 h-4 fill-current" />
+                <span>Buka Pesan 💖</span>
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {!isTransitioning ? (
@@ -129,4 +177,3 @@ export default function Landing() {
     </div>
   );
 }
-
